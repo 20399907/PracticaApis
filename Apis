@@ -1,0 +1,75 @@
+import requests
+
+def obtener_clima(ciudad, api_key):
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={api_key}&units=metric"
+    response = requests.get(url)
+    if response.status_code == 200:
+        datos = response.json()
+        print(f"Ciudad: {datos['name']}")
+        print(f"Temperatura: {datos['main']['temp']}°C")
+        print(f"Humedad: {datos['main']['humidity']}%")
+        print(f"Velocidad del viento: {datos['wind']['speed']} m/s")
+    else:
+        print("Error al obtener los datos del clima")
+
+def geocodificar_direccion(direccion, api_key):
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={direccion}&key={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        datos = response.json()
+        if datos['results']:
+            ubicacion = datos['results'][0]['geometry']['location']
+            print(f"Latitud: {ubicacion['lat']}, Longitud: {ubicacion['lng']}")
+        else:
+            print("No se encontraron resultados para la dirección proporcionada")
+    else:
+        print("Error al obtener los datos de geocodificación")
+
+def traducir_texto(texto, source_lang, target_lang, api_key):
+    url = f"https://translation.googleapis.com/language/translate/v2"
+    params = {
+        'q': texto,
+        'source': source_lang,
+        'target': target_lang,
+        'key': api_key
+    }
+    response = requests.post(url, data=params)
+    if response.status_code == 200:
+        datos = response.json()
+        traduccion = datos['data']['translations'][0]['translatedText']
+        print(f"Texto traducido: {traduccion}")
+    else:
+        print("Error al traducir el texto")
+
+def menu():
+    api_key_clima = 'tu_api_key_clima'
+    api_key_geocoding = 'tu_api_key_geocoding'
+    api_key_traduccion = 'tu_api_key_traduccion'
+
+    while True:
+        print("\nSeleccione una opción:")
+        print("1. Obtener clima")
+        print("2. Geocodificar dirección")
+        print("3. Traducir texto")
+        print("4. Salir")
+        
+        opcion = input("Opción: ")
+        
+        if opcion == '1':
+            ciudad = input("Ingrese el nombre de la ciudad: ")
+            obtener_clima(ciudad, api_key_clima)
+        elif opcion == '2':
+            direccion = input("Ingrese la dirección: ")
+            geocodificar_direccion(direccion, api_key_geocoding)
+        elif opcion == '3':
+            texto = input("Ingrese el texto a traducir: ")
+            source_lang = input("Ingrese el idioma de origen (ej. 'es' para español): ")
+            target_lang = input("Ingrese el idioma de destino (ej. 'en' para inglés): ")
+            traducir_texto(texto, source_lang, target_lang, api_key_traduccion)
+        elif opcion == '4':
+            break
+        else:
+            print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el menú
+menu()
